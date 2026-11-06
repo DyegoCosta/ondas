@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ground">#F5F7F7</color>
+    <color name="ink">#12242B</color>
+    <color name="muted">#526369</color>
+    <color name="hot">#CF3D10</color>
+    <color name="on_hot">#FFFFFF</color>
+    <color name="cool">#0F6E78</color>
+    <color name="on_cool">#FFFFFF</color>
+    <color name="cool_ground">#E3F1F2</color>
+    <color name="icon_background">#F5F7F7</color>
+    <color name="icon_wave">#CF3D10</color>
+</resources>

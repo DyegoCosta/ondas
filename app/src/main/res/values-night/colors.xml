@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ground">#0B1418</color>
+    <color name="ink">#EAF2F3</color>
+    <color name="muted">#A3B5BA</color>
+    <color name="hot">#E2562A</color>
+    <color name="on_hot">#1A0A04</color>
+    <color name="cool">#62CBD5</color>
+    <color name="on_cool">#06181B</color>
+    <color name="cool_ground">#0C2026</color>
+</resources>

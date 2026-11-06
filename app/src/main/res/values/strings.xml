@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ondas</string>
+    <string name="widget_small_label">Ondas: registrar</string>
+    <string name="widget_wide_label">Ondas: registrar e resumo</string>
+    <string name="widget_small_desc">Um toque registra uma onda de calor.</string>
+    <string name="widget_wide_desc">Registra com um toque e mostra as ondas de hoje.</string>
+    <string name="register">Registrar</string>
+    <string name="annotate">Anotar</string>
+    <string name="undo">Desfazer</string>
+</resources>

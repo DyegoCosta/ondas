@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/bg_widget_cool" android:gravity="center" android:orientation="vertical" android:padding="12dp">
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:importantForAccessibility="no" android:src="@drawable/ic_check_widget" />
+        <TextView android:id="@+id/time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp"
+            android:textColor="@color/ink" android:textSize="22sp" android:textStyle="bold" />
+    </LinearLayout>
+    <TextView android:id="@+id/annotate" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="8dp"
+        android:background="@drawable/bg_pill_cool" android:gravity="center" android:text="@string/annotate"
+        android:textColor="@color/on_cool" android:textSize="17sp" android:textStyle="bold" />
+</LinearLayout>
