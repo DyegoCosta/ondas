@@ -18,12 +18,13 @@ android {
 
     signingConfigs {
         create("release") {
-            // Chave deste app pessoal. Ela precisa ser sempre a mesma para que
-            // o Android aceite atualizações sem desinstalar e perder os dados.
-            storeFile = file("ondas-release.jks")
-            storePassword = "ondas-app-key"
+            // A chave vem de variáveis de ambiente (secrets do GitHub), nunca do repositório.
+            // Ela precisa ser sempre a mesma para que o Android aceite atualizações
+            // sem desinstalar e perder os dados.
+            System.getenv("ANDROID_KEYSTORE_PATH")?.let { storeFile = file(it) }
+            storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
             keyAlias = "ondas"
-            keyPassword = "ondas-app-key"
+            keyPassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
         }
     }
 
