@@ -44,6 +44,11 @@ object Format {
         return if (label == "Hoje") "Última às $time" else "Última: ${label.lowercase()}, $time"
     }
 
+    val INTENSITIES = listOf("Leve", "Moderada", "Forte")
+
+    fun intensityLabel(intensity: Int?): String =
+        intensity?.let { INTENSITIES.getOrNull(it - 1) } ?: "Sem intensidade"
+
     fun periodLabel(total: Int): String =
         if (total == 1) "1 onda nos últimos 14 dias" else "$total ondas nos últimos 14 dias"
 }

@@ -8,15 +8,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
 
-data class Entry(val id: Long, val at: Long, val note: String)
+/** intensity: 1 = leve, 2 = moderada, 3 = forte; null = não informada. */
+data class Entry(val id: Long, val at: Long, val note: String, val intensity: Int? = null)
 
-private class Db(context: Context) : SQLiteOpenHelper(context, "ondas.db", null, 1) {
+private class Db(context: Context) : SQLiteOpenHelper(context, "ondas.db", null, 2) {
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL("CREATE TABLE entries (id INTEGER PRIMARY KEY AUTOINCREMENT, at INTEGER NOT NULL, note TEXT NOT NULL DEFAULT '')")
+        db.execSQL("CREATE TABLE entries (id INTEGER PRIMARY KEY AUTOINCREMENT, at INTEGER NOT NULL, note TEXT NOT NULL DEFAULT '', intensity INTEGER)")
         db.execSQL("CREATE INDEX entries_at ON entries(at)")
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        if (oldVersion < 2) db.execSQL("ALTER TABLE entries ADD COLUMN intensity INTEGER")
+    }
 }
 
 /** Todos os registros ficam em um banco local; o app não tem permissão de internet. */
@@ -27,9 +30,9 @@ class OndasRepository private constructor(context: Context) {
     val entries: StateFlow<List<Entry>> = _entries
 
     private fun load(): List<Entry> =
-        db.readableDatabase.query("entries", arrayOf("id", "at", "note"), null, null, null, null, "at DESC, id DESC").use { c ->
+        db.readableDatabase.query("entries", arrayOf("id", "at", "note", "intensity"), null, null, null, null, "at DESC, id DESC").use { c ->
             buildList {
-                while (c.moveToNext()) add(Entry(c.getLong(0), c.getLong(1), c.getString(2)))
+                while (c.moveToNext()) add(Entry(c.getLong(0), c.getLong(1), c.getString(2), if (c.isNull(3)) null else c.getInt(3)))
             }
         }
 
@@ -54,6 +57,11 @@ class OndasRepository private constructor(context: Context) {
         changed(refreshWidgets = false)
     }
 
+    fun updateIntensity(id: Long, intensity: Int?) {
+        db.writableDatabase.update("entries", ContentValues().apply { put("intensity", intensity) }, "id = ?", arrayOf(id.toString()))
+        changed(refreshWidgets = false)
+    }
+
     fun updateAt(id: Long, at: Long) {
         db.writableDatabase.update("entries", ContentValues().apply { put("at", at) }, "id = ?", arrayOf(id.toString()))
         changed()
@@ -64,12 +72,13 @@ class OndasRepository private constructor(context: Context) {
         changed()
     }
 
-    /** Devolve um registro excluído, com o mesmo id, data e anotação. */
+    /** Devolve um registro excluído, com o mesmo id, data, anotação e intensidade. */
     fun restore(entry: Entry) {
         db.writableDatabase.insertWithOnConflict("entries", null, ContentValues().apply {
             put("id", entry.id)
             put("at", entry.at)
             put("note", entry.note)
+            put("intensity", entry.intensity)
         }, SQLiteDatabase.CONFLICT_REPLACE)
         changed()
     }
