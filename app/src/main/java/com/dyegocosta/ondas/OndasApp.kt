@@ -7,7 +7,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -70,6 +72,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -319,6 +322,8 @@ private fun NoteScreen(
                     }
                 }
 
+                IntensityPicker(entry.intensity) { repository.updateIntensity(entry.id, it) }
+
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Anotação (opcional)", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
                     OutlinedTextField(
@@ -384,6 +389,45 @@ private fun NoteScreen(
 }
 
 @Composable
+private fun IntensityPicker(value: Int?, onChange: (Int?) -> Unit) {
+    val p = LocalPalette.current
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+            Text("Intensidade ", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            Text("(opcional)", fontSize = 18.sp, color = p.muted, modifier = Modifier.weight(1f))
+            if (value != null) {
+                TextButton(onClick = { onChange(null) }, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Text("Limpar", color = p.cool, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            Format.INTENSITIES.forEachIndexed { index, name ->
+                val level = index + 1
+                val on = value == level
+                Surface(
+                    onClick = { onChange(level) },
+                    modifier = Modifier.weight(1f).heightIn(min = 72.dp).semantics { selected = on },
+                    shape = RoundedCornerShape(16.dp),
+                    color = p.surface,
+                    contentColor = p.ink,
+                    border = if (on) BorderStroke(2.5.dp, p.ink) else BorderStroke(1.5.dp, p.line),
+                ) {
+                    Column(
+                        Modifier.padding(vertical = 12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+                    ) {
+                        Box(Modifier.size(22.dp).background(p.intensity[index], CircleShape))
+                        Text(name, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun LocalTextStyleBody() = androidx.compose.ui.text.TextStyle(fontSize = 18.sp, lineHeight = 25.sp)
 
 @Composable
@@ -395,7 +439,7 @@ private fun WhenButton(label: String, description: String, modifier: Modifier, o
         shape = RoundedCornerShape(14.dp),
         contentPadding = PaddingValues(horizontal = 12.dp),
         colors = ButtonDefaults.outlinedButtonColors(containerColor = p.surface, contentColor = p.ink),
-        border = androidx.compose.foundation.BorderStroke(1.5.dp, p.field),
+        border = BorderStroke(1.5.dp, p.field),
     ) {
         Text(label, fontSize = 17.sp, maxLines = 1)
     }
@@ -490,7 +534,15 @@ private fun EntryRow(entry: Entry, onClick: () -> Unit) {
     val p = LocalPalette.current
     Surface(onClick = onClick, color = p.ground, contentColor = p.ink, modifier = Modifier.fillMaxWidth()) {
         Column {
-            Row(Modifier.heightIn(min = 64.dp).padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(Modifier.heightIn(min = 64.dp).padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                val dot = Modifier
+                    .padding(top = 5.dp)
+                    .size(16.dp)
+                    .semantics { contentDescription = Format.intensityLabel(entry.intensity) }
+                Box(
+                    entry.intensity?.let { dot.background(p.intensity[it - 1], CircleShape) }
+                        ?: dot.border(2.dp, p.field, CircleShape),
+                )
                 Text(Format.clock(entry.at), fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(60.dp))
                 Text(
                     entry.note.ifBlank { "Sem anotação" },

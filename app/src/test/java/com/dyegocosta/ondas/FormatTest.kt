@@ -32,4 +32,10 @@ class FormatTest {
         assertEquals("S", Format.weekdayLetter(today))
         assertEquals("D", Format.weekdayLetter(LocalDate.of(2026, 11, 8)))
     }
+
+    @Test fun intensityLabels() {
+        assertEquals("Leve", Format.intensityLabel(1))
+        assertEquals("Forte", Format.intensityLabel(3))
+        assertEquals("Sem intensidade", Format.intensityLabel(null))
+    }
 }
